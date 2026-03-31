@@ -4,11 +4,11 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 
 export default [
   {
-    ignores: ['dist/**', 'node_modules/**']
+    ignores: ['dist/**', 'dist-frontend/**', 'node_modules/**', 'src-tauri/target/**']
   },
   js.configs.recommended,
   {
-    files: ['src/**/*.ts'],
+    files: ['src/**/*.ts', 'ui/**/*.ts'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -17,7 +17,11 @@ export default [
       globals: {
         console: 'readonly',
         process: 'readonly',
-        Buffer: 'readonly'
+        Buffer: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
+        MutationObserver: 'readonly',
+        fetch: 'readonly'
       }
     },
     plugins: {

@@ -8,8 +8,11 @@
   },
   "scripts": {
     "test": "vitest run",
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && vite build",
     "dev": "tsx src/cli.ts",
+    "dev:frontend": "vite",
+    "build:frontend": "vite build",
+    "preview:frontend": "vite preview",
     "dev:cli": "tsx src/cli.ts",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build",
@@ -22,13 +25,19 @@
   "type": "module",
   "private": true,
   "dependencies": {
+    "@tauri-apps/plugin-dialog": "^2.6.0",
+    "adm-zip": "^0.5.16",
     "argon2": "^0.44.0",
     "commander": "^14.0.3",
+    "mammoth": "^1.12.0",
+    "pdf-parse": "^2.4.5",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@tauri-apps/api": "^2.10.1",
     "@tauri-apps/cli": "^2.10.1",
+    "@types/adm-zip": "^0.5.8",
     "@types/node": "^25.5.0",
     "@typescript-eslint/eslint-plugin": "^8.58.0",
     "@typescript-eslint/parser": "^8.58.0",
@@ -36,6 +45,7 @@
     "prettier": "^3.8.1",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2",
+    "vite": "^8.0.3",
     "vitest": "^4.1.2"
   }
 }

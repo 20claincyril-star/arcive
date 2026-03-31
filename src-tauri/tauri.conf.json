@@ -4,8 +4,9 @@
   "version": "0.1.0",
   "identifier": "com.arcive.desktop",
   "build": {
-    "frontendDist": "../ui",
-    "beforeBuildCommand": ""
+    "frontendDist": "../dist-frontend",
+    "beforeDevCommand": "npm run dev:frontend",
+    "beforeBuildCommand": "npm run build:frontend"
   },
   "app": {
     "windows": [

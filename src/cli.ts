@@ -202,6 +202,37 @@ program
     console.log(JSON.stringify(report, null, 2));
   });
 
+program
+  .command('backup')
+  .requiredOption('--vault <path>', 'Chemin du coffre')
+  .requiredOption('--password <value>', 'Mot de passe du coffre')
+  .requiredOption('--out <path>', 'Chemin de l archive de sauvegarde')
+  .option('--json', 'Sortie JSON')
+  .action(async (opts) => {
+    const store = await openVault(opts.vault, opts.password);
+    const backup = await store.createBackup(opts.out);
+    if (opts.json) {
+      console.log(JSON.stringify({ ok: true, ...backup }));
+      return;
+    }
+    console.log(`Sauvegarde créée: ${backup.outPath}`);
+  });
+
+program
+  .command('restore-vault')
+  .requiredOption('--from <path>', 'Archive de sauvegarde')
+  .requiredOption('--vault <path>', 'Chemin du coffre restauré')
+  .requiredOption('--password <value>', 'Mot de passe du coffre')
+  .option('--json', 'Sortie JSON')
+  .action(async (opts) => {
+    const restored = await VaultStore.restoreFromBackup(opts.from, opts.vault, opts.password);
+    if (opts.json) {
+      console.log(JSON.stringify({ ok: true, ...restored }));
+      return;
+    }
+    console.log(`Coffre restauré: ${restored.vaultPath}`);
+  });
+
 program.parseAsync().catch((error: unknown) => {
   if (isJsonMode()) {
     console.log(JSON.stringify(errorToPayload(error)));

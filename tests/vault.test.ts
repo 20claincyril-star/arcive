@@ -39,6 +39,22 @@ describe('VaultStore', () => {
     expect(content).toBe('version2');
   });
 
+  it('refuse un manifeste corrompu au dechiffrement', async () => {
+    const { dir, sourceFile } = await fixture('corrupted');
+    const vaultPath = join(dir, 'vault');
+    const store = await VaultStore.create(vaultPath, 'motdepasse-fort');
+    await store.importFile(sourceFile);
+
+    const manifestPath = join(vaultPath, 'manifest.enc.json');
+    const original = await readFile(manifestPath, 'utf8');
+    const corrupted = original.replace(/payload":\s*"/, 'payload": "AA'); // tronque le payload base64
+    await writeFile(manifestPath, corrupted, 'utf8');
+
+    await expect(
+      VaultStore.open(vaultPath, 'motdepasse-fort')
+    ).rejects.toThrow();
+  });
+
   it('indexe le texte des formats textuels', async () => {
     const { dir, sourceFile } = await fixture('dossier mutuelle 2026');
     const vaultPath = join(dir, 'vault');
@@ -47,6 +63,22 @@ describe('VaultStore', () => {
 
     const byContent = store.search('mutuelle');
     expect(byContent).toHaveLength(1);
+  });
+
+  it('tolère les fichiers pdf/docx non extractibles', async () => {
+    const { dir } = await fixture('ignored');
+    const vaultPath = join(dir, 'vault');
+    const store = await VaultStore.create(vaultPath, 'motdepasse-fort');
+    const fakePdf = join(dir, 'scan.pdf');
+    const fakeDocx = join(dir, 'courrier.docx');
+    await writeFile(fakePdf, Buffer.from('pas un vrai pdf'));
+    await writeFile(fakeDocx, Buffer.from('pas un vrai docx'));
+
+    const docPdf = await store.importFile(fakePdf, ['scan']);
+    const docDocx = await store.importFile(fakeDocx, ['docx']);
+
+    expect(docPdf.searchableText).toBe('');
+    expect(docDocx.searchableText).toBe('');
   });
 
   it('permet la rotation de mot de passe', async () => {
@@ -72,5 +104,22 @@ describe('VaultStore', () => {
     const count = await store.purgeDeleted();
     expect(count).toBe(1);
     expect(store.list(true)).toHaveLength(0);
+  });
+
+  it('sauvegarde puis restaure un coffre', async () => {
+    const { dir, sourceFile } = await fixture('backup-restore');
+    const vaultPath = join(dir, 'vault');
+    const backupPath = join(dir, 'backup.zip');
+    const restoredPath = join(dir, 'restored-vault');
+    const store = await VaultStore.create(vaultPath, 'motdepasse-fort');
+    await store.importFile(sourceFile, ['archive']);
+
+    const backup = await store.createBackup(backupPath);
+    expect(backup.documents).toBe(1);
+
+    const restored = await VaultStore.restoreFromBackup(backupPath, restoredPath, 'motdepasse-fort');
+    expect(restored.documents).toBe(1);
+    const reopened = await VaultStore.open(restoredPath, 'motdepasse-fort');
+    expect(reopened.list()).toHaveLength(1);
   });
 });

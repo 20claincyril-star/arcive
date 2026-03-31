@@ -21,7 +21,7 @@ Arcive manipule des documents sensibles. Toute faille de chiffrement, fuite de m
 
 ## Hardening roadmap
 
-- Migration PBKDF2 -> Argon2id
+- Parametrage clair d'Argon2id (memoryCost, timeCost, parallelism)
 - Cloisonnement strict des cles derivees
-- Gestion zero-copy / zeroization des buffers sensibles
+- Gestion zero-copy / zeroization des buffers sensibles (dans la mesure du possible en Node/JS)
 - Audit externe avant version 1.0.0 stable

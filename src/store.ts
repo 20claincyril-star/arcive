@@ -1,6 +1,9 @@
 import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
 import { mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { basename, join, resolve } from 'node:path';
+import AdmZip from 'adm-zip';
+import mammoth from 'mammoth';
+import { PDFParse } from 'pdf-parse';
 import { decryptBuffer, deriveKey, deriveKeyArgon2id, deriveKeyFromConfig, encryptBuffer } from './crypto.js';
 import type { DocumentRecord, SearchResult, VaultManifest } from './types.js';
 
@@ -51,8 +54,10 @@ export class VaultStore {
       Buffer.from(raw.salt, 'base64'),
       raw.kdf ?? { algorithm: 'pbkdf2-sha256', iterations: 210_000, keyLength: 32 }
     );
-    const plain = decryptBuffer(Buffer.from(raw.payload, 'base64'), keyMaterial.key);
+    const cipher = Buffer.from(raw.payload, 'base64');
+    const plain = decryptBuffer(cipher, keyMaterial.key);
     const manifest = JSON.parse(plain.toString('utf8')) as VaultManifest;
+    plain.fill(0);
     if (!manifest.kdf) {
       const legacy = await deriveKey(password, Buffer.from(manifest.salt, 'base64'));
       manifest.kdf = legacy.kdf;
@@ -87,10 +92,11 @@ export class VaultStore {
     const blobPath = join('blobs', `${versionId}.bin`);
     await writeFile(join(this.root, blobPath), encrypted);
     const timestamp = nowIso();
+    const searchableText = await extractSearchableText(filePath, buffer);
     const record: DocumentRecord = {
       id,
       name: basename(filePath),
-      searchableText: extractSearchableText(filePath, buffer),
+      searchableText,
       currentVersionId: versionId,
       tags,
       createdAt: timestamp,
@@ -156,7 +162,7 @@ export class VaultStore {
       note
     });
     doc.currentVersionId = versionId;
-    doc.searchableText = extractSearchableText(filePath, buffer);
+    doc.searchableText = await extractSearchableText(filePath, buffer);
     doc.updatedAt = nowIso();
     await this.saveManifest();
   }
@@ -193,6 +199,54 @@ export class VaultStore {
     const encrypted = await readFile(join(this.root, current.blobPath));
     const plain = decryptBuffer(encrypted, this.key);
     await writeFile(targetPath, plain);
+  }
+
+  async createBackup(outPath: string): Promise<{ outPath: string; documents: number; versions: number }> {
+    const resolvedOut = resolve(outPath);
+    const zip = new AdmZip();
+    const manifestPath = join(this.root, MANIFEST);
+    const manifest = await readFile(manifestPath);
+    zip.addFile(MANIFEST, manifest);
+
+    let versions = 0;
+    for (const doc of this.list(true)) {
+      for (const version of doc.versions) {
+        const blobAbs = join(this.root, version.blobPath);
+        const blobData = await readFile(blobAbs);
+        zip.addFile(version.blobPath.replaceAll('\\', '/'), blobData);
+        versions += 1;
+      }
+    }
+    const meta = {
+      format: 'arcive-backup-v1',
+      createdAt: nowIso(),
+      documents: this.list(true).length,
+      versions
+    };
+    zip.addFile('METADATA.json', Buffer.from(JSON.stringify(meta, null, 2), 'utf8'));
+    zip.writeZip(resolvedOut);
+    return { outPath: resolvedOut, documents: meta.documents, versions };
+  }
+
+  static async restoreFromBackup(
+    backupPath: string,
+    vaultPath: string,
+    password: string
+  ): Promise<{ vaultPath: string; documents: number }> {
+    const resolvedBackup = resolve(backupPath);
+    const resolvedVault = resolve(vaultPath);
+    await rm(resolvedVault, { recursive: true, force: true });
+    await mkdir(resolvedVault, { recursive: true });
+    const zip = new AdmZip(resolvedBackup);
+    zip.extractAllTo(resolvedVault, true);
+
+    const store = await VaultStore.open(resolvedVault, password);
+    const docs = store.list(true).length;
+    const check = await store.healthCheck();
+    if (check.orphanBlobs.length > 0) {
+      throw new Error(`Restauration incomplète: ${check.orphanBlobs.length} blob(s) orphelin(s).`);
+    }
+    return { vaultPath: resolvedVault, documents: docs };
   }
 
   async purgeDeleted(): Promise<number> {
@@ -243,15 +297,42 @@ export class VaultStore {
   }
 }
 
-function extractSearchableText(filePath: string, buffer: Buffer): string {
+async function extractSearchableText(filePath: string, buffer: Buffer): Promise<string> {
   const lower = filePath.toLowerCase();
   const textExtensions = ['.txt', '.md', '.json', '.csv', '.xml', '.html', '.log'];
   if (textExtensions.some((ext) => lower.endsWith(ext))) {
     return sanitizeText(buffer.toString('utf8'));
+  }
+  if (lower.endsWith('.pdf')) {
+    return sanitizeText(await extractPdfText(buffer));
+  }
+  if (lower.endsWith('.docx')) {
+    return sanitizeText(await extractDocxText(buffer));
   }
   return '';
 }
 
 function sanitizeText(value: string): string {
   return value.replace(/\s+/g, ' ').trim().slice(0, 20_000);
+}
+
+async function extractPdfText(buffer: Buffer): Promise<string> {
+  const parser = new PDFParse({ data: buffer });
+  try {
+    const parsed = await parser.getText();
+    return parsed.text ?? '';
+  } catch {
+    return '';
+  } finally {
+    await parser.destroy();
+  }
+}
+
+async function extractDocxText(buffer: Buffer): Promise<string> {
+  try {
+    const parsed = await mammoth.extractRawText({ buffer });
+    return parsed.value ?? '';
+  } catch {
+    return '';
+  }
 }

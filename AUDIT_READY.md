@@ -12,9 +12,9 @@
 
 - [ ] campagne de tests manuels UI desktop (cas limites + erreurs)
 - [ ] tests d'integration dedies au pont Tauri/CLI
-- [ ] revue de zeroization memoire des secrets
-- [ ] verification des fichiers temporaires export/edition
-- [ ] pipeline CI avec publication artefacts signee
+- [ ] revue de zeroization memoire des secrets (limites Node/JS explicitees)
+- [ ] verification des fichiers temporaires export/edition (emplacement, retention)
+- [ ] pipeline CI avec publication artefacts signee (verification des signatures)
 
 ## Pieces a fournir a l'auditeur
 
@@ -23,3 +23,4 @@
 - architecture (`ARCHITECTURE.md`)
 - politique securite (`SECURITY.md`)
 - modele de menaces (`THREAT_MODEL.md`)
+- procedures de release/signature (`SIGNING.md`, workflows GitHub)

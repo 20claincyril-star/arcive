@@ -12,6 +12,7 @@ Prototype V1 en CLI TypeScript (Windows/macOS/Linux) avec:
 - suppression logique / restauration / purge definitive
 - recherche locale par nom et etiquettes
 - recherche locale dans le contenu texte indexable (`.txt`, `.md`, `.json`, etc.)
+- recherche enrichie sur contenu extrait depuis `PDF` texte et `.docx`
 - export dechiffre du document courant
 - rotation de mot de passe du coffre
 - verifications de coherence (orphan blobs)
@@ -63,6 +64,7 @@ L'UI desktop MVP couvre maintenant:
 - export document courant
 - rotation de mot de passe
 - verrouillage automatique de la session UI par inactivite (configurable)
+- diagnostic coffre (blobs, versions suivies, orphelins)
 
 ## Securite (prototype)
 
@@ -89,3 +91,9 @@ Documents securite:
 ## Licence
 
 Apache-2.0
+
+## Packaging et signature
+
+- Build desktop: `npm run tauri:build`
+- Publication tag: workflow `.github/workflows/release.yml`
+- Signature Windows: voir `SIGNING.md`

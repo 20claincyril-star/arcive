@@ -192,6 +192,43 @@ fn vault_rotate_password(
   ])
 }
 
+#[tauri::command]
+fn vault_check(vault: String, password: String) -> Result<serde_json::Value, String> {
+  run_cli_json(&["check", "--vault", &vault, "--password", &password, "--json"])
+}
+
+#[tauri::command]
+fn vault_backup(vault: String, password: String, out: String) -> Result<serde_json::Value, String> {
+  run_cli_json(&[
+    "backup",
+    "--vault",
+    &vault,
+    "--password",
+    &password,
+    "--out",
+    &out,
+    "--json",
+  ])
+}
+
+#[tauri::command]
+fn vault_restore_backup(
+  from: String,
+  vault: String,
+  password: String,
+) -> Result<serde_json::Value, String> {
+  run_cli_json(&[
+    "restore-vault",
+    "--from",
+    &from,
+    "--vault",
+    &vault,
+    "--password",
+    &password,
+    "--json",
+  ])
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
@@ -205,7 +242,10 @@ pub fn run() {
       vault_restore,
       vault_export,
       vault_purge,
-      vault_rotate_password
+      vault_rotate_password,
+      vault_check,
+      vault_backup,
+      vault_restore_backup
     ])
     .setup(|app| {
       if cfg!(debug_assertions) {
@@ -217,6 +257,7 @@ pub fn run() {
       }
       Ok(())
     })
+    .plugin(tauri_plugin_dialog::init())
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
 }
