@@ -1,0 +1,41 @@
+{
+  "name": "arcive",
+  "version": "0.1.0",
+  "description": "Local-first encrypted document vault",
+  "main": "dist/cli.js",
+  "bin": {
+    "arcive": "dist/cli.js"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/cli.ts",
+    "dev:cli": "tsx src/cli.ts",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "lint": "eslint .",
+    "format": "prettier --check ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "argon2": "^0.44.0",
+    "commander": "^14.0.3",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@tauri-apps/cli": "^2.10.1",
+    "@types/node": "^25.5.0",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
+    "eslint": "^10.1.0",
+    "prettier": "^3.8.1",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2",
+    "vitest": "^4.1.2"
+  }
+}

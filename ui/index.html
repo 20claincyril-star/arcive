@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arcive</title>
+    <style>
+      body {
+        font-family: Segoe UI, Arial, sans-serif;
+        margin: 0;
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+      main {
+        max-width: 960px;
+        margin: 2rem auto;
+        padding: 0 1rem 2rem;
+      }
+      h1 {
+        margin-bottom: 0.4rem;
+      }
+      .grid {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: 1fr 1fr;
+      }
+      .card {
+        background: #111827;
+        border: 1px solid #334155;
+        border-radius: 10px;
+        padding: 1rem;
+      }
+      label {
+        display: block;
+        margin-bottom: 0.4rem;
+        font-size: 0.9rem;
+      }
+      input, button {
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        padding: 0.6rem 0.7rem;
+        background: #0b1222;
+        color: #e2e8f0;
+      }
+      button {
+        background: #2563eb;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover { background: #1d4ed8; }
+      .row { margin-bottom: 0.7rem; }
+      .list { margin-top: 1rem; }
+      .item {
+        border-top: 1px solid #334155;
+        padding: 0.6rem 0;
+      }
+      .muted { color: #94a3b8; font-size: 0.9rem; }
+      #status {
+        margin: 0.8rem 0;
+        color: #93c5fd;
+      }
+      .danger {
+        background: #b91c1c;
+      }
+      .danger:hover {
+        background: #991b1b;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Arcive Desktop</h1>
+      <p class="muted">MVP local: init, import, list, search via moteur chiffré.</p>
+      <div id="status">Prêt.</div>
+      <section class="card" style="margin-bottom: 1rem">
+        <h3>Session</h3>
+        <div class="grid">
+          <div class="row">
+            <label for="lockMinutes">Verrouillage auto (minutes)</label>
+            <input id="lockMinutes" type="number" min="1" max="180" value="5" />
+          </div>
+          <div class="row">
+            <label>&nbsp;</label>
+            <button id="btnApplySession">Appliquer la politique session</button>
+          </div>
+        </div>
+      </section>
+      <div class="grid">
+        <section class="card">
+          <h3>Coffre</h3>
+          <div class="row">
+            <label for="vault">Chemin coffre</label>
+            <input id="vault" value="C:\arcive\vault-demo" />
+          </div>
+          <div class="row">
+            <label for="password">Mot de passe</label>
+            <input id="password" type="password" value="demo-pass" />
+          </div>
+          <button id="btnInit">Initialiser le coffre</button>
+        </section>
+        <section class="card">
+          <h3>Importer</h3>
+          <div class="row">
+            <label for="file">Fichier (chemin absolu)</label>
+            <input id="file" placeholder="C:\arcive\sample.txt" />
+          </div>
+          <div class="row">
+            <label for="tags">Tags (csv)</label>
+            <input id="tags" placeholder="impots,2026" />
+          </div>
+          <button id="btnImport">Importer le document</button>
+        </section>
+      </div>
+      <section class="card" style="margin-top: 1rem">
+        <h3>Recherche</h3>
+        <div class="row">
+          <label for="query">Texte de recherche</label>
+          <input id="query" placeholder="facture" />
+        </div>
+        <div class="grid">
+          <button id="btnList">Lister les documents</button>
+          <button id="btnSearch">Rechercher</button>
+        </div>
+        <div class="list" id="results"></div>
+      </section>
+      <section class="card" style="margin-top: 1rem">
+        <h3>Actions document</h3>
+        <div class="grid">
+          <div>
+            <div class="row">
+              <label for="docId">ID document</label>
+              <input id="docId" placeholder="UUID document" />
+            </div>
+            <div class="row">
+              <label for="versionFile">Fichier nouvelle version</label>
+              <input id="versionFile" placeholder="C:\arcive\sample-v2.txt" />
+            </div>
+            <div class="row">
+              <label for="versionNote">Note version</label>
+              <input id="versionNote" placeholder="correction" />
+            </div>
+            <button id="btnVersion">Ajouter une version</button>
+          </div>
+          <div>
+            <div class="row">
+              <label for="exportOut">Chemin export</label>
+              <input id="exportOut" placeholder="C:\arcive\export.txt" />
+            </div>
+            <div class="grid">
+              <button id="btnDelete">Supprimer (corbeille)</button>
+              <button id="btnRestore">Restaurer</button>
+            </div>
+            <div class="grid" style="margin-top: 0.7rem">
+              <button id="btnExport">Exporter</button>
+              <button id="btnPurge" class="danger">Purger la corbeille</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="card" style="margin-top: 1rem">
+        <h3>Sécurité coffre</h3>
+        <div class="row">
+          <label for="newPassword">Nouveau mot de passe</label>
+          <input id="newPassword" type="password" placeholder="nouveau mot de passe" />
+        </div>
+        <button id="btnRotatePassword">Rotation mot de passe</button>
+      </section>
+    </main>
+    <script type="module">
+      const invoke = window.__TAURI_INTERNALS__?.invoke;
+      const status = document.getElementById('status');
+      const results = document.getElementById('results');
+      let busy = false;
+      let lockTimer = null;
+      let lockMinutes = 5;
+
+      function getValue(id) {
+        return document.getElementById(id).value;
+      }
+
+      function setStatus(message, isError = false) {
+        status.textContent = message;
+        status.style.color = isError ? '#fca5a5' : '#93c5fd';
+      }
+
+      function requireFields(fields) {
+        for (const id of fields) {
+          const value = getValue(id)?.trim();
+          if (!value) {
+            throw new Error(`Champ requis manquant: ${id}`);
+          }
+        }
+      }
+
+      function setBusy(value) {
+        busy = value;
+        for (const btn of document.querySelectorAll('button')) {
+          btn.disabled = value;
+          btn.style.opacity = value ? '0.7' : '1';
+        }
+      }
+
+      function clearPasswordByLock() {
+        document.getElementById('password').value = '';
+        setStatus('Session verrouillée (inactivité). Saisis de nouveau le mot de passe.', true);
+      }
+
+      function restartLockTimer() {
+        if (lockTimer) {
+          clearTimeout(lockTimer);
+        }
+        const ms = Math.max(1, Number(lockMinutes)) * 60 * 1000;
+        lockTimer = setTimeout(clearPasswordByLock, ms);
+      }
+
+      function touchActivity() {
+        restartLockTimer();
+      }
+
+      async function runAction(action, onSuccess) {
+        if (busy) {
+          return;
+        }
+        try {
+          setBusy(true);
+          touchActivity();
+          const data = await action();
+          if (onSuccess) {
+            await onSuccess(data);
+          }
+        } catch (error) {
+          setStatus(String(error), true);
+        } finally {
+          setBusy(false);
+        }
+      }
+
+      async function refreshList() {
+        const docs = await call('vault_list', {
+          vault: getValue('vault'),
+          password: getValue('password')
+        });
+        render(docs);
+        setStatus(`${docs.length} document(s).`);
+      }
+
+      function render(items) {
+        results.innerHTML = '';
+        if (!items.length) {
+          results.innerHTML = '<p class="muted">Aucun resultat.</p>';
+          return;
+        }
+        for (const item of items) {
+          const el = document.createElement('div');
+          el.className = 'item';
+          const tags = Array.isArray(item.tags) ? item.tags.join(', ') : '';
+          el.innerHTML = `<strong>${item.name}</strong><div class="muted">${item.id}</div><div class="muted">${tags}</div>`;
+          el.style.cursor = 'pointer';
+          el.addEventListener('click', () => {
+            document.getElementById('docId').value = item.id;
+            setStatus(`Document sélectionné: ${item.name}`);
+          });
+          results.appendChild(el);
+        }
+      }
+
+      async function call(cmd, payload) {
+        if (!invoke) {
+          throw new Error('API Tauri indisponible');
+        }
+        return invoke(cmd, payload);
+      }
+
+      document.getElementById('btnApplySession').addEventListener('click', () => {
+        try {
+          const value = Number(getValue('lockMinutes'));
+          if (!Number.isFinite(value) || value < 1 || value > 180) {
+            throw new Error('lockMinutes doit être entre 1 et 180');
+          }
+          lockMinutes = value;
+          restartLockTimer();
+          setStatus(`Politique session appliquée (${lockMinutes} min).`);
+        } catch (error) {
+          setStatus(String(error), true);
+        }
+      });
+
+      document.getElementById('btnInit').addEventListener('click', async () => {
+        await runAction(
+          async () => {
+            requireFields(['vault', 'password']);
+          setStatus('Initialisation du coffre...');
+            return call('vault_init', {
+            vault: getValue('vault'),
+            password: getValue('password')
+          });
+          },
+          async () => {
+            setStatus('Coffre initialise.');
+            await refreshList();
+          }
+        );
+      });
+
+      document.getElementById('btnImport').addEventListener('click', async () => {
+        await runAction(
+          async () => {
+            requireFields(['vault', 'password', 'file']);
+          setStatus('Import en cours...');
+            return call('vault_import', {
+            vault: getValue('vault'),
+            password: getValue('password'),
+            file: getValue('file'),
+            tagsCsv: getValue('tags')
+          });
+          },
+          async (doc) => {
+            setStatus(`Document importe: ${doc.name}`);
+            await refreshList();
+          }
+        );
+      });
+
+      document.getElementById('btnList').addEventListener('click', async () => {
+        await runAction(async () => {
+          requireFields(['vault', 'password']);
+          setStatus('Chargement des documents...');
+          await refreshList();
+        });
+      });
+
+      document.getElementById('btnSearch').addEventListener('click', async () => {
+        await runAction(async () => {
+          requireFields(['vault', 'password', 'query']);
+          setStatus('Recherche...');
+          const docs = await call('vault_search', {
+            vault: getValue('vault'),
+            password: getValue('password'),
+            query: getValue('query')
+          });
+          render(docs);
+          setStatus(`${docs.length} resultat(s).`);
+        });
+      });
+
+      document.getElementById('btnVersion').addEventListener('click', async () => {
+        await runAction(
+          async () => {
+            requireFields(['vault', 'password', 'docId', 'versionFile']);
+          setStatus('Ajout de version...');
+            return call('vault_add_version', {
+            vault: getValue('vault'),
+            password: getValue('password'),
+            id: getValue('docId'),
+            file: getValue('versionFile'),
+            note: getValue('versionNote') || null
+          });
+          },
+          async () => {
+            setStatus('Version ajoutée.');
+            await refreshList();
+          }
+        );
+      });
+
+      document.getElementById('btnDelete').addEventListener('click', async () => {
+        await runAction(
+          async () => {
+            requireFields(['vault', 'password', 'docId']);
+          setStatus('Suppression logique...');
+            return call('vault_delete', {
+            vault: getValue('vault'),
+            password: getValue('password'),
+            id: getValue('docId')
+          });
+          },
+          async () => {
+            setStatus('Document envoyé en corbeille.');
+            await refreshList();
+          }
+        );
+      });
+
+      document.getElementById('btnRestore').addEventListener('click', async () => {
+        await runAction(
+          async () => {
+            requireFields(['vault', 'password', 'docId']);
+          setStatus('Restauration...');
+            return call('vault_restore', {
+            vault: getValue('vault'),
+            password: getValue('password'),
+            id: getValue('docId')
+          });
+          },
+          async () => {
+            setStatus('Document restauré.');
+            await refreshList();
+          }
+        );
+      });
+
+      document.getElementById('btnExport').addEventListener('click', async () => {
+        await runAction(async () => {
+          requireFields(['vault', 'password', 'docId', 'exportOut']);
+          setStatus('Export...');
+          const out = getValue('exportOut');
+          await call('vault_export', {
+            vault: getValue('vault'),
+            password: getValue('password'),
+            id: getValue('docId'),
+            out
+          });
+          setStatus(`Export terminé: ${out}`);
+        });
+      });
+
+      document.getElementById('btnPurge').addEventListener('click', async () => {
+        await runAction(
+          async () => {
+            requireFields(['vault', 'password']);
+          setStatus('Purge de la corbeille...');
+            return call('vault_purge', {
+            vault: getValue('vault'),
+            password: getValue('password')
+          });
+          },
+          async (response) => {
+            setStatus(`Purge terminée (${response.purged} document(s)).`);
+            await refreshList();
+          }
+        );
+      });
+
+      document.getElementById('btnRotatePassword').addEventListener('click', async () => {
+        await runAction(async () => {
+          requireFields(['vault', 'password', 'newPassword']);
+          setStatus('Rotation du mot de passe...');
+          await call('vault_rotate_password', {
+            vault: getValue('vault'),
+            password: getValue('password'),
+            newPassword: getValue('newPassword')
+          });
+          document.getElementById('password').value = getValue('newPassword');
+          document.getElementById('newPassword').value = '';
+          setStatus('Mot de passe mis à jour.');
+        });
+      });
+
+      ['click', 'keydown', 'mousemove'].forEach((evt) => {
+        window.addEventListener(evt, touchActivity, { passive: true });
+      });
+      restartLockTimer();
+    </script>
+  </body>
+</html>
