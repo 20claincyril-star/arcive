@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.0.1] - 2026-05-XX
+
+### Fixed
+
+- Corrections issues des tests manuels sur Arcive 1.0.0 (parcours creation/import/recherche/backup/restore)
+- Amelioration de la robustesse des dialogues fichiers (annulation, chemins invalides, acces refuses)
+- Suppression des derniers cas residuels de messages d'erreur avec stacktrace brute
+
+### Changed
+
+- Polish UI/UX (libelles, messages, etats de boutons, petits ajustements visuels)
+- Harmonisation du ton et du format des messages d'erreur utilisateur
+
+### Notes
+
+- Pas de nouvelles fonctionnalites pour 1.0.1 : version uniquement focus sur la stabilite et le polish de la 1.0.0
+
 ## [1.0.0] - 2026-04-XX
 
 ### Added
