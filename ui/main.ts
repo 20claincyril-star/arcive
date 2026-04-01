@@ -157,6 +157,13 @@ function setStatus(message: string, isError = false): void {
   status.style.color = isError ? '#fca5a5' : '#93c5fd';
 }
 
+function normalizeErrorMessage(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return String(error);
+}
+
 function requireFields(fields: string[]): void {
   for (const id of fields) {
     const value = getValue(id)?.trim();
@@ -171,8 +178,8 @@ function setBusy(value: boolean): void {
   const buttons = document.querySelectorAll('button');
   buttons.forEach((btn) => {
     (btn as HTMLButtonElement).disabled = value;
-    (btn as HTMLButtonElement).style.opacity = value ? '0.7' : '1';
   });
+  document.body.classList.toggle('arcive-busy', value);
 }
 
 function clearPasswordByLock(): void {
@@ -217,12 +224,19 @@ async function runAction<T>(
 }
 
 function formatUiError(error: unknown): string {
-  const message = String(error);
+  const raw = normalizeErrorMessage(error);
+  const message = raw.split('\n')[0] ?? raw;
   if (message.includes('Mot de passe actuel invalide')) return 'Mot de passe invalide.';
   if (message.includes('Document introuvable')) return 'Document introuvable.';
   if (message.includes('Version courante introuvable')) return 'Version introuvable.';
   if (message.includes('Champ requis manquant')) return message;
   if (message.includes('API Tauri indisponible')) return 'Interface Tauri indisponible.';
+  if (message.toLowerCase().includes('enoent')) {
+    return 'Fichier ou dossier introuvable. Vérifie le chemin sélectionné.';
+  }
+  if (message.toLowerCase().includes('permission') || message.toLowerCase().includes('access')) {
+    return 'Accès refusé. Vérifie tes droits sur le fichier ou le dossier.';
+  }
   return `Erreur: ${message}`;
 }
 
@@ -310,13 +324,13 @@ document.getElementById('btnApplySession')?.addEventListener('click', () => {
   try {
     const value = Number(getValue('lockMinutes'));
     if (!Number.isFinite(value) || value < 1 || value > 180) {
-      throw new Error('lockMinutes doit être entre 1 et 180');
+      throw new Error('Le verrouillage auto doit être entre 1 et 180 minutes.');
     }
     lockMinutes = value;
     restartLockTimer();
     setStatus(`Politique session appliquée (${lockMinutes} min).`);
   } catch (error) {
-    setStatus(String(error), true);
+    setStatus(formatUiError(error), true);
   }
 });
 
@@ -393,7 +407,7 @@ document.getElementById('btnBackup')?.addEventListener('click', async () => {
       defaultPath: 'arcive-backup.zip'
     });
     if (!outPath) {
-      setStatus('Sauvegarde annulée.');
+      setStatus('Sauvegarde annulée par l’utilisateur.');
       return;
     }
     setStatus('Création de la sauvegarde...');
@@ -416,12 +430,12 @@ document.getElementById('btnRestoreBackup')?.addEventListener('click', async () 
       filters: [{ name: 'Arcive backup', extensions: ['zip'] }]
     });
     if (typeof backupPath !== 'string') {
-      setStatus('Restauration annulée.');
+      setStatus('Restauration annulée (aucun fichier sélectionné).');
       return;
     }
     const vaultDir = await open({ directory: true, multiple: false });
     if (typeof vaultDir !== 'string') {
-      setStatus('Restauration annulée.');
+      setStatus('Restauration annulée (aucun dossier cible sélectionné).');
       return;
     }
     setStatus('Restauration en cours...');
@@ -568,6 +582,8 @@ document
         getInput('vault').value = selected;
         rememberVault(selected);
         setStatus(`Coffre sélectionné: ${selected}`);
+      } else {
+        setStatus('Sélection de coffre annulée.');
       }
     });
   });
@@ -588,6 +604,8 @@ document
       if (typeof selected === 'string') {
         getInput('file').value = selected;
         setStatus(`Fichier sélectionné: ${selected}`);
+      } else {
+        setStatus('Sélection de fichier annulée.');
       }
     });
   });
@@ -605,6 +623,8 @@ document
       if (selected) {
         getInput('exportOut').value = selected;
         setStatus(`Fichier d'export choisi: ${selected}`);
+      } else {
+        setStatus('Sélection du chemin d’export annulée.');
       }
     });
   });

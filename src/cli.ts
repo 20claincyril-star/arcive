@@ -234,11 +234,12 @@ program
   });
 
 program.parseAsync().catch((error: unknown) => {
+  const payload = errorToPayload(error);
   if (isJsonMode()) {
-    console.log(JSON.stringify(errorToPayload(error)));
+    console.log(JSON.stringify(payload));
     process.exitCode = 1;
     return;
   }
-  console.error(error);
+  console.error(`Erreur: ${payload.error}`);
   process.exitCode = 1;
 });

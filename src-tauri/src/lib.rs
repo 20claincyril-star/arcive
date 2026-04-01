@@ -21,13 +21,18 @@ fn run_cli_json(args: &[&str]) -> Result<serde_json::Value, String> {
       }
     }
     let code = output.status.code().unwrap_or(-1);
-    return Err(format!(
-      "Commande CLI en erreur (code {code}): {}",
-      if stderr.trim().is_empty() {
-        "erreur inconnue"
+    let summary = if stderr.trim().is_empty() {
+      "erreur inconnue".to_string()
+    } else {
+      let first_line = stderr.lines().next().unwrap_or_default().trim();
+      if first_line.is_empty() {
+        "erreur inconnue".to_string()
       } else {
-        stderr.trim()
+        first_line.to_string()
       }
+    };
+    return Err(format!(
+      "Commande CLI en erreur (code {code}): {summary}"
     ));
   }
 
@@ -38,11 +43,7 @@ fn run_cli_json(args: &[&str]) -> Result<serde_json::Value, String> {
     return Ok(value);
   }
 
-  Err(format!(
-    "Réponse JSON invalide: stdout='{}' stderr='{}'",
-    stdout.trim(),
-    stderr.trim()
-  ))
+  Err("Réponse du moteur invalide (format JSON attendu)".to_string())
 }
 
 #[tauri::command]
