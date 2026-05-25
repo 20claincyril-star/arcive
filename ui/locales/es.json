@@ -1,0 +1,153 @@
+{
+  "app": {
+    "title": "Arcive Desktop",
+    "subtitle": "Caja fuerte local cifrada, búsqueda enriquecida y diagnóstico."
+  },
+  "header": {
+    "langLabel": "Idioma",
+    "helpBtn": "Ayuda"
+  },
+  "status": {
+    "ready": "Listo.",
+    "sessionLocked": "Sesión bloqueada (inactividad). Vuelve a introducir la contraseña.",
+    "sessionPolicyApplied": "Política de sesión aplicada ({minutes} min).",
+    "vaultInitInProgress": "Inicializando la caja fuerte...",
+    "vaultInitialized": "Caja fuerte inicializada.",
+    "importInProgress": "Importación en curso...",
+    "documentImported": "Documento importado: {name}",
+    "loadingDocuments": "Cargando documentos...",
+    "documentsCount": "{count} documento(s).",
+    "searchInProgress": "Buscando...",
+    "searchResults": "{count} resultado(s).",
+    "healthCheckInProgress": "Analizando la caja fuerte...",
+    "healthOrphans": "Diagnóstico terminado: {count} blob(s) huérfano(s) detectado(s).",
+    "healthOk": "Diagnóstico terminado: caja fuerte coherente.",
+    "backupCancelled": "Copia de seguridad cancelada por el usuario.",
+    "backupInProgress": "Creando copia de seguridad...",
+    "backupCreated": "Copia creada ({docs} docs, {versions} versiones) en {path}",
+    "restoreCancelledNoFile": "Restauración cancelada (ningún archivo seleccionado).",
+    "restoreCancelledNoVault": "Restauración cancelada (ninguna carpeta destino seleccionada).",
+    "restoreInProgress": "Restauración en curso...",
+    "vaultRestored": "Caja fuerte restaurada ({count} documentos) en {path}",
+    "versionAdding": "Añadiendo versión...",
+    "versionAdded": "Versión añadida.",
+    "deleteInProgress": "Eliminación lógica en curso...",
+    "documentTrashed": "Documento enviado a la papelera.",
+    "documentRestoring": "Restaurando...",
+    "documentRestored": "Documento restaurado.",
+    "exportInProgress": "Exportando...",
+    "exportDone": "Exportación terminada: {path}",
+    "purgeInProgress": "Vaciando la papelera...",
+    "purgeDone": "Purgado completado ({count} documento(s)).",
+    "passwordRotating": "Rotando la contraseña...",
+    "passwordUpdated": "Contraseña actualizada.",
+    "vaultSelected": "Caja fuerte seleccionada: {path}",
+    "vaultPickCancelled": "Selección de caja fuerte cancelada.",
+    "fileSelected": "Archivo seleccionado: {path}",
+    "filePickCancelled": "Selección de archivo cancelada.",
+    "exportPathSelected": "Ruta de exportación elegida: {path}",
+    "exportPathCancelled": "Selección de ruta de exportación cancelada.",
+    "documentSelected": "Documento seleccionado: {name}"
+  },
+  "session": {
+    "title": "Sesión",
+    "lockMinutes": "Bloqueo automático (minutos)",
+    "applyBtn": "Aplicar política de sesión"
+  },
+  "vault": {
+    "title": "Caja fuerte",
+    "pathLabel": "Ruta de la caja",
+    "pathPlaceholder": "Elige una carpeta de caja fuerte",
+    "browseBtn": "Examinar...",
+    "passwordLabel": "Contraseña",
+    "initBtn": "Inicializar la caja fuerte"
+  },
+  "import": {
+    "title": "Importar",
+    "fileLabel": "Archivo",
+    "filePlaceholder": "Elige un archivo",
+    "browseBtn": "Examinar...",
+    "tagsLabel": "Etiquetas (csv)",
+    "tagsPlaceholder": "impuestos,2026",
+    "importBtn": "Importar documento"
+  },
+  "search": {
+    "title": "Búsqueda",
+    "queryLabel": "Texto de búsqueda",
+    "queryPlaceholder": "factura",
+    "listBtn": "Listar documentos",
+    "searchBtn": "Buscar",
+    "noResults": "Sin resultados."
+  },
+  "recent": {
+    "title": "Cajas recientes",
+    "none": "Ninguna caja fuerte reciente."
+  },
+  "diagnostic": {
+    "title": "Diagnóstico de la caja",
+    "analyzeBtn": "Analizar salud de la caja",
+    "none": "Ningún diagnóstico ejecutado.",
+    "summary": "Blobs: {blobs}, versiones seguidas: {versions}, huérfanos: {orphans}"
+  },
+  "backup": {
+    "title": "Copia / transferencia",
+    "createBtn": "Crear copia ZIP",
+    "restoreBtn": "Restaurar desde ZIP"
+  },
+  "doc": {
+    "title": "Acciones del documento",
+    "idLabel": "ID del documento",
+    "idPlaceholder": "UUID del documento",
+    "versionFileLabel": "Archivo nueva versión",
+    "versionFilePlaceholder": "Ruta del archivo de versión",
+    "versionNoteLabel": "Nota de versión",
+    "versionNotePlaceholder": "corrección",
+    "addVersionBtn": "Añadir versión",
+    "exportPathLabel": "Ruta de exportación",
+    "exportPathPlaceholder": "Elige una ruta de exportación",
+    "browseExportBtn": "Examinar...",
+    "deleteBtn": "Eliminar (papelera)",
+    "restoreBtn": "Restaurar",
+    "exportBtn": "Exportar",
+    "purgeBtn": "Vaciar papelera"
+  },
+  "security": {
+    "title": "Seguridad de la caja",
+    "newPasswordLabel": "Nueva contraseña",
+    "newPasswordPlaceholder": "nueva contraseña",
+    "rotateBtn": "Rotar contraseña"
+  },
+  "error": {
+    "requiredField": "Campo obligatorio faltante: {field}",
+    "elementNotFound": "Elemento no encontrado: {id}",
+    "invalidPassword": "Contraseña no válida.",
+    "documentNotFound": "Documento no encontrado.",
+    "versionNotFound": "Versión no encontrada.",
+    "tauriUnavailable": "Interfaz Tauri no disponible.",
+    "pathNotFound": "Archivo o carpeta no encontrado. Comprueba la ruta seleccionada.",
+    "accessDenied": "Acceso denegado. Comprueba tus permisos en el archivo o carpeta.",
+    "generic": "Error: {message}",
+    "lockMinutesRange": "El bloqueo automático debe estar entre 1 y 180 minutos."
+  },
+  "dialog": {
+    "backupFilter": "Copia Arcive",
+    "documentsFilter": "Documentos"
+  },
+  "help": {
+    "title": "Ayuda Arcive",
+    "intro": "Arcive es una caja fuerte documental local cifrada. Esta ayuda resume las acciones principales de la interfaz.",
+    "vaultTitle": "Caja fuerte",
+    "vaultBody": "Elige una carpeta, introduce la contraseña e inicializa la caja. Las cajas recientes aparecen abajo.",
+    "importTitle": "Importar",
+    "importBody": "Selecciona un archivo, añade etiquetas CSV opcionales e importa en la caja abierta.",
+    "searchTitle": "Búsqueda",
+    "searchBody": "Lista todos los documentos o busca por texto en nombres, etiquetas y contenido indexado.",
+    "docTitle": "Documentos",
+    "docBody": "Haz clic en un resultado para rellenar el ID. Exporta, añade versión, envía a papelera o restaura.",
+    "backupTitle": "Copia de seguridad",
+    "backupBody": "Crea un ZIP cifrado de la caja o restaura desde una copia hacia una carpeta nueva.",
+    "securityTitle": "Seguridad",
+    "securityBody": "La sesión se bloquea tras inactividad. Puedes rotar la contraseña de la caja.",
+    "backBtn": "Volver a la aplicación"
+  }
+}

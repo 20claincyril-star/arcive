@@ -1,6 +1,6 @@
 {
   "name": "arcive",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "description": "Local-first encrypted document vault",
   "main": "dist/cli.js",
   "bin": {

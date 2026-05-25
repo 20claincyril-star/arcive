@@ -1,0 +1,153 @@
+{
+  "app": {
+    "title": "Arcive Desktop",
+    "subtitle": "Coffre local chiffré, recherche enrichie et diagnostic."
+  },
+  "header": {
+    "langLabel": "Langue",
+    "helpBtn": "Aide"
+  },
+  "status": {
+    "ready": "Prêt.",
+    "sessionLocked": "Session verrouillée (inactivité). Saisis de nouveau le mot de passe.",
+    "sessionPolicyApplied": "Politique session appliquée ({minutes} min).",
+    "vaultInitInProgress": "Initialisation du coffre...",
+    "vaultInitialized": "Coffre initialisé.",
+    "importInProgress": "Import en cours...",
+    "documentImported": "Document importé : {name}",
+    "loadingDocuments": "Chargement des documents...",
+    "documentsCount": "{count} document(s).",
+    "searchInProgress": "Recherche...",
+    "searchResults": "{count} résultat(s).",
+    "healthCheckInProgress": "Analyse du coffre...",
+    "healthOrphans": "Diagnostic terminé : {count} blob(s) orphelin(s) détecté(s).",
+    "healthOk": "Diagnostic terminé : coffre cohérent.",
+    "backupCancelled": "Sauvegarde annulée par l'utilisateur.",
+    "backupInProgress": "Création de la sauvegarde...",
+    "backupCreated": "Sauvegarde créée ({docs} docs, {versions} versions) vers {path}",
+    "restoreCancelledNoFile": "Restauration annulée (aucun fichier sélectionné).",
+    "restoreCancelledNoVault": "Restauration annulée (aucun dossier cible sélectionné).",
+    "restoreInProgress": "Restauration en cours...",
+    "vaultRestored": "Coffre restauré ({count} documents) dans {path}",
+    "versionAdding": "Ajout de version...",
+    "versionAdded": "Version ajoutée.",
+    "deleteInProgress": "Suppression logique...",
+    "documentTrashed": "Document envoyé en corbeille.",
+    "documentRestoring": "Restauration...",
+    "documentRestored": "Document restauré.",
+    "exportInProgress": "Export...",
+    "exportDone": "Export terminé : {path}",
+    "purgeInProgress": "Purge de la corbeille...",
+    "purgeDone": "Purge terminée ({count} document(s)).",
+    "passwordRotating": "Rotation du mot de passe...",
+    "passwordUpdated": "Mot de passe mis à jour.",
+    "vaultSelected": "Coffre sélectionné : {path}",
+    "vaultPickCancelled": "Sélection de coffre annulée.",
+    "fileSelected": "Fichier sélectionné : {path}",
+    "filePickCancelled": "Sélection de fichier annulée.",
+    "exportPathSelected": "Fichier d'export choisi : {path}",
+    "exportPathCancelled": "Sélection du chemin d'export annulée.",
+    "documentSelected": "Document sélectionné : {name}"
+  },
+  "session": {
+    "title": "Session",
+    "lockMinutes": "Verrouillage auto (minutes)",
+    "applyBtn": "Appliquer la politique session"
+  },
+  "vault": {
+    "title": "Coffre",
+    "pathLabel": "Chemin coffre",
+    "pathPlaceholder": "Choisis un dossier de coffre",
+    "browseBtn": "Parcourir...",
+    "passwordLabel": "Mot de passe",
+    "initBtn": "Initialiser le coffre"
+  },
+  "import": {
+    "title": "Importer",
+    "fileLabel": "Fichier",
+    "filePlaceholder": "Choisis un fichier",
+    "browseBtn": "Parcourir...",
+    "tagsLabel": "Tags (csv)",
+    "tagsPlaceholder": "impots,2026",
+    "importBtn": "Importer le document"
+  },
+  "search": {
+    "title": "Recherche",
+    "queryLabel": "Texte de recherche",
+    "queryPlaceholder": "facture",
+    "listBtn": "Lister les documents",
+    "searchBtn": "Rechercher",
+    "noResults": "Aucun résultat."
+  },
+  "recent": {
+    "title": "Coffres récents",
+    "none": "Aucun coffre récent."
+  },
+  "diagnostic": {
+    "title": "Diagnostic coffre",
+    "analyzeBtn": "Analyser la santé du coffre",
+    "none": "Aucun diagnostic exécuté.",
+    "summary": "Blobs : {blobs}, versions suivies : {versions}, orphelins : {orphans}"
+  },
+  "backup": {
+    "title": "Sauvegarde / transfert",
+    "createBtn": "Créer une sauvegarde ZIP",
+    "restoreBtn": "Restaurer depuis un ZIP"
+  },
+  "doc": {
+    "title": "Actions document",
+    "idLabel": "ID document",
+    "idPlaceholder": "UUID document",
+    "versionFileLabel": "Fichier nouvelle version",
+    "versionFilePlaceholder": "Chemin du fichier version",
+    "versionNoteLabel": "Note version",
+    "versionNotePlaceholder": "correction",
+    "addVersionBtn": "Ajouter une version",
+    "exportPathLabel": "Chemin export",
+    "exportPathPlaceholder": "Choisis un chemin d'export",
+    "browseExportBtn": "Parcourir...",
+    "deleteBtn": "Supprimer (corbeille)",
+    "restoreBtn": "Restaurer",
+    "exportBtn": "Exporter",
+    "purgeBtn": "Purger la corbeille"
+  },
+  "security": {
+    "title": "Sécurité coffre",
+    "newPasswordLabel": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "nouveau mot de passe",
+    "rotateBtn": "Rotation mot de passe"
+  },
+  "error": {
+    "requiredField": "Champ requis manquant : {field}",
+    "elementNotFound": "Élément introuvable : {id}",
+    "invalidPassword": "Mot de passe invalide.",
+    "documentNotFound": "Document introuvable.",
+    "versionNotFound": "Version introuvable.",
+    "tauriUnavailable": "Interface Tauri indisponible.",
+    "pathNotFound": "Fichier ou dossier introuvable. Vérifie le chemin sélectionné.",
+    "accessDenied": "Accès refusé. Vérifie tes droits sur le fichier ou le dossier.",
+    "generic": "Erreur : {message}",
+    "lockMinutesRange": "Le verrouillage auto doit être entre 1 et 180 minutes."
+  },
+  "dialog": {
+    "backupFilter": "Sauvegarde Arcive",
+    "documentsFilter": "Documents"
+  },
+  "help": {
+    "title": "Aide Arcive",
+    "intro": "Arcive est un coffre documentaire local chiffré. Cette aide résume les actions principales de l'interface.",
+    "vaultTitle": "Coffre",
+    "vaultBody": "Choisis un dossier, saisis le mot de passe et initialise le coffre. Les coffres récents apparaissent plus bas.",
+    "importTitle": "Import",
+    "importBody": "Sélectionne un fichier, ajoute des tags CSV optionnels, puis importe dans le coffre ouvert.",
+    "searchTitle": "Recherche",
+    "searchBody": "Liste tous les documents ou recherche par texte dans les noms, tags et contenu indexé.",
+    "docTitle": "Documents",
+    "docBody": "Clique un résultat pour remplir l'ID. Exporte, ajoute une version, envoie en corbeille ou restaure.",
+    "backupTitle": "Sauvegarde",
+    "backupBody": "Crée un ZIP chiffré du coffre ou restaure depuis une sauvegarde vers un nouveau dossier.",
+    "securityTitle": "Sécurité",
+    "securityBody": "La session se verrouille après inactivité. Tu peux faire tourner le mot de passe du coffre.",
+    "backBtn": "Retour à l'application"
+  }
+}

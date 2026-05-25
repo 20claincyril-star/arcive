@@ -2,6 +2,20 @@
 
 Arcive est un coffre documentaire local-first avec chiffrement au repos, versioning, recherche et corbeille.
 
+## Pour les utilisateurs
+
+| Langue | Guide |
+|--------|-------|
+| Francais | [DOCS/USER_GUIDE_FR.md](DOCS/USER_GUIDE_FR.md) |
+| English | [DOCS/USER_GUIDE_EN.md](DOCS/USER_GUIDE_EN.md) |
+| Espanol | [DOCS/USER_GUIDE_ES.md](DOCS/USER_GUIDE_ES.md) |
+
+**Demarrage rapide (application desktop)** : installe les dependances (`npm install`), lance `npm run tauri:dev`, choisis un dossier de coffre, un mot de passe, puis initialise le coffre. L interface est disponible en **francais**, **anglais** et **espagnol** (selecteur en haut a droite).
+
+---
+
+## Developpeurs
+
 ## Etat actuel
 
 Prototype V1 en CLI TypeScript (Windows/macOS/Linux) avec:

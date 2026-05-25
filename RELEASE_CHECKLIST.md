@@ -47,6 +47,5 @@
   - la perte de donnees
   - la corruption silencieuse
   - la fuite de contenu en clair hors du coffre
-
-
-La publication est possible pour un prototype (`v0.x`), mais pas encore en "stable 1.0.0".
+La liste ci-dessus decrit l'etat minimal pour une publication prototype (`v0.x`).
+La section "Definition of Done 1.0.0" ci-dessus decrit les conditions supplementaires pour une release stable 1.0.0.

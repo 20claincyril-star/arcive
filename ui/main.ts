@@ -1,130 +1,163 @@
 import { invoke } from '@tauri-apps/api/core';
 import { open, save } from '@tauri-apps/plugin-dialog';
+import { initI18n, applyI18n, t } from './i18n.js';
 
 const appRoot = document.getElementById('app') as HTMLDivElement;
 appRoot.innerHTML = `
-  <h1>Arcive Desktop</h1>
-  <p class="muted">Coffre local chiffré, recherche enrichie et diagnostic.</p>
-  <div id="status">Prêt.</div>
+  <header class="app-header">
+    <div>
+      <h1 data-i18n="app.title">Arcive Desktop</h1>
+      <p class="muted" data-i18n="app.subtitle">Coffre local chiffré, recherche enrichie et diagnostic.</p>
+    </div>
+    <div class="app-header-actions">
+      <label for="langSelect" data-i18n="header.langLabel">Langue</label>
+      <select id="langSelect" aria-label="Language">
+        <option value="fr">FR</option>
+        <option value="en">EN</option>
+        <option value="es">ES</option>
+      </select>
+      <button id="btnHelp" type="button" data-i18n-title="header.helpBtn" title="Aide">?</button>
+    </div>
+  </header>
+  <div id="main-ui">
+  <div id="status" data-i18n="status.ready">Prêt.</div>
   <section class="card" style="margin-bottom: 1rem">
-    <h3>Session</h3>
+    <h3 data-i18n="session.title">Session</h3>
     <div class="grid">
       <div class="row">
-        <label for="lockMinutes">Verrouillage auto (minutes)</label>
+        <label for="lockMinutes" data-i18n="session.lockMinutes">Verrouillage auto (minutes)</label>
         <input id="lockMinutes" type="number" min="1" max="180" value="5" />
       </div>
       <div class="row">
         <label>&nbsp;</label>
-        <button id="btnApplySession">Appliquer la politique session</button>
+        <button id="btnApplySession" data-i18n="session.applyBtn">Appliquer la politique session</button>
       </div>
     </div>
   </section>
   <div class="grid">
     <section class="card">
-      <h3>Coffre</h3>
+      <h3 data-i18n="vault.title">Coffre</h3>
       <div class="row">
-        <label for="vault">Chemin coffre</label>
+        <label for="vault" data-i18n="vault.pathLabel">Chemin coffre</label>
         <div style="display:grid;grid-template-columns:1fr auto;gap:.5rem;">
-          <input id="vault" placeholder="Choisis un dossier de coffre" />
-          <button id="btnPickVault">Parcourir...</button>
+          <input id="vault" data-i18n-placeholder="vault.pathPlaceholder" placeholder="Choisis un dossier de coffre" />
+          <button id="btnPickVault" data-i18n="vault.browseBtn">Parcourir...</button>
         </div>
       </div>
       <div class="row">
-        <label for="password">Mot de passe</label>
+        <label for="password" data-i18n="vault.passwordLabel">Mot de passe</label>
         <input id="password" type="password" value="demo-pass" />
       </div>
-      <button id="btnInit">Initialiser le coffre</button>
+      <button id="btnInit" data-i18n="vault.initBtn">Initialiser le coffre</button>
     </section>
     <section class="card">
-      <h3>Importer</h3>
+      <h3 data-i18n="import.title">Importer</h3>
       <div class="row">
-        <label for="file">Fichier</label>
+        <label for="file" data-i18n="import.fileLabel">Fichier</label>
         <div style="display:grid;grid-template-columns:1fr auto;gap:.5rem;">
-          <input id="file" placeholder="Choisis un fichier" />
-          <button id="btnPickImport">Parcourir...</button>
+          <input id="file" data-i18n-placeholder="import.filePlaceholder" placeholder="Choisis un fichier" />
+          <button id="btnPickImport" data-i18n="import.browseBtn">Parcourir...</button>
         </div>
       </div>
       <div class="row">
-        <label for="tags">Tags (csv)</label>
-        <input id="tags" placeholder="impots,2026" />
+        <label for="tags" data-i18n="import.tagsLabel">Tags (csv)</label>
+        <input id="tags" data-i18n-placeholder="import.tagsPlaceholder" placeholder="impots,2026" />
       </div>
-      <button id="btnImport">Importer le document</button>
+      <button id="btnImport" data-i18n="import.importBtn">Importer le document</button>
     </section>
   </div>
   <section class="card" style="margin-top:1rem">
-    <h3>Recherche</h3>
+    <h3 data-i18n="search.title">Recherche</h3>
     <div class="row">
-      <label for="query">Texte de recherche</label>
-      <input id="query" placeholder="facture" />
+      <label for="query" data-i18n="search.queryLabel">Texte de recherche</label>
+      <input id="query" data-i18n-placeholder="search.queryPlaceholder" placeholder="facture" />
     </div>
     <div class="grid">
-      <button id="btnList">Lister les documents</button>
-      <button id="btnSearch">Rechercher</button>
+      <button id="btnList" data-i18n="search.listBtn">Lister les documents</button>
+      <button id="btnSearch" data-i18n="search.searchBtn">Rechercher</button>
     </div>
     <div class="list" id="results"></div>
   </section>
   <section class="card" style="margin-top:1rem">
-    <h3>Coffres récents</h3>
+    <h3 data-i18n="recent.title">Coffres récents</h3>
     <div id="recentVaults" class="list"></div>
   </section>
   <section class="card" style="margin-top:1rem">
-    <h3>Diagnostic coffre</h3>
+    <h3 data-i18n="diagnostic.title">Diagnostic coffre</h3>
     <div class="grid">
-      <button id="btnHealthCheck">Analyser la santé du coffre</button>
-      <div id="healthSummary" class="muted">Aucun diagnostic exécuté.</div>
+      <button id="btnHealthCheck" data-i18n="diagnostic.analyzeBtn">Analyser la santé du coffre</button>
+      <div id="healthSummary" class="muted" data-i18n="diagnostic.none">Aucun diagnostic exécuté.</div>
     </div>
   </section>
   <section class="card" style="margin-top:1rem">
-    <h3>Sauvegarde / transfert</h3>
+    <h3 data-i18n="backup.title">Sauvegarde / transfert</h3>
     <div class="grid">
-      <button id="btnBackup">Créer une sauvegarde ZIP</button>
-      <button id="btnRestoreBackup">Restaurer depuis un ZIP</button>
+      <button id="btnBackup" data-i18n="backup.createBtn">Créer une sauvegarde ZIP</button>
+      <button id="btnRestoreBackup" data-i18n="backup.restoreBtn">Restaurer depuis un ZIP</button>
     </div>
   </section>
   <section class="card" style="margin-top:1rem">
-    <h3>Actions document</h3>
+    <h3 data-i18n="doc.title">Actions document</h3>
     <div class="grid">
       <div>
         <div class="row">
-          <label for="docId">ID document</label>
-          <input id="docId" placeholder="UUID document" />
+          <label for="docId" data-i18n="doc.idLabel">ID document</label>
+          <input id="docId" data-i18n-placeholder="doc.idPlaceholder" placeholder="UUID document" />
         </div>
         <div class="row">
-          <label for="versionFile">Fichier nouvelle version</label>
-          <input id="versionFile" placeholder="Chemin du fichier version" />
+          <label for="versionFile" data-i18n="doc.versionFileLabel">Fichier nouvelle version</label>
+          <input id="versionFile" data-i18n-placeholder="doc.versionFilePlaceholder" placeholder="Chemin du fichier version" />
         </div>
         <div class="row">
-          <label for="versionNote">Note version</label>
-          <input id="versionNote" placeholder="correction" />
+          <label for="versionNote" data-i18n="doc.versionNoteLabel">Note version</label>
+          <input id="versionNote" data-i18n-placeholder="doc.versionNotePlaceholder" placeholder="correction" />
         </div>
-        <button id="btnVersion">Ajouter une version</button>
+        <button id="btnVersion" data-i18n="doc.addVersionBtn">Ajouter une version</button>
       </div>
       <div>
         <div class="row">
-          <label for="exportOut">Chemin export</label>
+          <label for="exportOut" data-i18n="doc.exportPathLabel">Chemin export</label>
           <div style="display:grid;grid-template-columns:1fr auto;gap:.5rem;">
-            <input id="exportOut" placeholder="Choisis un chemin d'export" />
-            <button id="btnPickExport">Parcourir...</button>
+            <input id="exportOut" data-i18n-placeholder="doc.exportPathPlaceholder" placeholder="Choisis un chemin d'export" />
+            <button id="btnPickExport" data-i18n="doc.browseExportBtn">Parcourir...</button>
           </div>
         </div>
         <div class="grid">
-          <button id="btnDelete">Supprimer (corbeille)</button>
-          <button id="btnRestore">Restaurer</button>
+          <button id="btnDelete" data-i18n="doc.deleteBtn">Supprimer (corbeille)</button>
+          <button id="btnRestore" data-i18n="doc.restoreBtn">Restaurer</button>
         </div>
         <div class="grid" style="margin-top:.7rem">
-          <button id="btnExport">Exporter</button>
-          <button id="btnPurge" class="danger">Purger la corbeille</button>
+          <button id="btnExport" data-i18n="doc.exportBtn">Exporter</button>
+          <button id="btnPurge" class="danger" data-i18n="doc.purgeBtn">Purger la corbeille</button>
         </div>
       </div>
     </div>
   </section>
   <section class="card" style="margin-top:1rem">
-    <h3>Sécurité coffre</h3>
+    <h3 data-i18n="security.title">Sécurité coffre</h3>
     <div class="row">
-      <label for="newPassword">Nouveau mot de passe</label>
-      <input id="newPassword" type="password" placeholder="nouveau mot de passe" />
+      <label for="newPassword" data-i18n="security.newPasswordLabel">Nouveau mot de passe</label>
+      <input id="newPassword" type="password" data-i18n-placeholder="security.newPasswordPlaceholder" placeholder="nouveau mot de passe" />
     </div>
-    <button id="btnRotatePassword">Rotation mot de passe</button>
+    <button id="btnRotatePassword" data-i18n="security.rotateBtn">Rotation mot de passe</button>
+  </section>
+  </div>
+  <section id="help-panel" class="help-panel hidden">
+    <h2 data-i18n="help.title">Aide Arcive</h2>
+    <p data-i18n="help.intro">Arcive est un coffre documentaire local chiffré.</p>
+    <h3 data-i18n="help.vaultTitle">Coffre</h3>
+    <p data-i18n="help.vaultBody">Choisis un dossier, saisis le mot de passe et initialise le coffre.</p>
+    <h3 data-i18n="help.importTitle">Import</h3>
+    <p data-i18n="help.importBody">Sélectionne un fichier, ajoute des tags CSV optionnels, puis importe.</p>
+    <h3 data-i18n="help.searchTitle">Recherche</h3>
+    <p data-i18n="help.searchBody">Liste tous les documents ou recherche par texte.</p>
+    <h3 data-i18n="help.docTitle">Documents</h3>
+    <p data-i18n="help.docBody">Clique un résultat pour remplir l'ID.</p>
+    <h3 data-i18n="help.backupTitle">Sauvegarde</h3>
+    <p data-i18n="help.backupBody">Crée un ZIP chiffré du coffre ou restaure depuis une sauvegarde.</p>
+    <h3 data-i18n="help.securityTitle">Sécurité</h3>
+    <p data-i18n="help.securityBody">La session se verrouille après inactivité.</p>
+    <button id="btnBackFromHelp" type="button" data-i18n="help.backBtn">Retour à l'application</button>
   </section>
 `;
 
@@ -139,7 +172,7 @@ let lockMinutes = 5;
 function getElement<T extends HTMLElement>(id: string): T {
   const el = document.getElementById(id) as T | null;
   if (!el) {
-    throw new Error(`Element introuvable: ${id}`);
+    throw new Error(t('error.elementNotFound', { id }));
   }
   return el;
 }
@@ -168,7 +201,7 @@ function requireFields(fields: string[]): void {
   for (const id of fields) {
     const value = getValue(id)?.trim();
     if (!value) {
-      throw new Error(`Champ requis manquant: ${id}`);
+      throw new Error(t('error.requiredField', { field: id }));
     }
   }
 }
@@ -185,7 +218,7 @@ function setBusy(value: boolean): void {
 function clearPasswordByLock(): void {
   getInput('password').value = '';
   setStatus(
-    'Session verrouillée (inactivité). Saisis de nouveau le mot de passe.',
+    t('status.sessionLocked'),
     true
   );
 }
@@ -226,18 +259,18 @@ async function runAction<T>(
 function formatUiError(error: unknown): string {
   const raw = normalizeErrorMessage(error);
   const message = raw.split('\n')[0] ?? raw;
-  if (message.includes('Mot de passe actuel invalide')) return 'Mot de passe invalide.';
-  if (message.includes('Document introuvable')) return 'Document introuvable.';
-  if (message.includes('Version courante introuvable')) return 'Version introuvable.';
+  if (message.includes('Mot de passe actuel invalide')) return t('error.invalidPassword');
+  if (message.includes('Document introuvable')) return t('error.documentNotFound');
+  if (message.includes('Version courante introuvable')) return t('error.versionNotFound');
   if (message.includes('Champ requis manquant')) return message;
-  if (message.includes('API Tauri indisponible')) return 'Interface Tauri indisponible.';
+  if (message.includes('API Tauri indisponible')) return t('error.tauriUnavailable');
   if (message.toLowerCase().includes('enoent')) {
-    return 'Fichier ou dossier introuvable. Vérifie le chemin sélectionné.';
+    return t('error.pathNotFound');
   }
   if (message.toLowerCase().includes('permission') || message.toLowerCase().includes('access')) {
-    return 'Accès refusé. Vérifie tes droits sur le fichier ou le dossier.';
+    return t('error.accessDenied');
   }
-  return `Erreur: ${message}`;
+  return t('error.generic', { message });
 }
 
 async function call<T = unknown>(
@@ -253,13 +286,13 @@ async function refreshList(): Promise<void> {
     password: getValue('password')
   });
   render(docs);
-  setStatus(`${docs.length} document(s).`);
+  setStatus(t('status.documentsCount', { count: docs.length }));
 }
 
 function render(items: any[]): void {
   results.innerHTML = '';
   if (!items.length) {
-    results.innerHTML = '<p class="muted">Aucun resultat.</p>';
+    results.innerHTML = `<p class="muted">${t('search.noResults')}</p>`;
     return;
   }
   for (const item of items) {
@@ -270,7 +303,7 @@ function render(items: any[]): void {
     el.style.cursor = 'pointer';
     el.addEventListener('click', () => {
       getInput('docId').value = item.id;
-      setStatus(`Document sélectionné: ${item.name}`);
+      setStatus(t('status.documentSelected', { name: item.name }));
     });
     results.appendChild(el);
   }
@@ -288,7 +321,7 @@ function loadRecentVaults(): void {
   }
   recentVaults.innerHTML = '';
   if (!items.length) {
-    recentVaults.innerHTML = '<p class="muted">Aucun coffre récent.</p>';
+    recentVaults.innerHTML = `<p class="muted">${t('recent.none')}</p>`;
     return;
   }
   for (const path of items) {
@@ -298,7 +331,7 @@ function loadRecentVaults(): void {
     el.style.cursor = 'pointer';
     el.addEventListener('click', () => {
       getInput('vault').value = path;
-      setStatus(`Coffre sélectionné: ${path}`);
+      setStatus(t('status.vaultSelected', { path }));
     });
     recentVaults.appendChild(el);
   }
@@ -324,11 +357,11 @@ document.getElementById('btnApplySession')?.addEventListener('click', () => {
   try {
     const value = Number(getValue('lockMinutes'));
     if (!Number.isFinite(value) || value < 1 || value > 180) {
-      throw new Error('Le verrouillage auto doit être entre 1 et 180 minutes.');
+      throw new Error(t('error.lockMinutesRange'));
     }
     lockMinutes = value;
     restartLockTimer();
-    setStatus(`Politique session appliquée (${lockMinutes} min).`);
+    setStatus(t('status.sessionPolicyApplied', { minutes: lockMinutes }));
   } catch (error) {
     setStatus(formatUiError(error), true);
   }
@@ -338,14 +371,14 @@ document.getElementById('btnInit')?.addEventListener('click', async () => {
   await runAction(
     async () => {
       requireFields(['vault', 'password']);
-      setStatus('Initialisation du coffre...');
+      setStatus(t('status.vaultInitInProgress'));
       return call('vault_init', {
         vault: getValue('vault'),
         password: getValue('password')
       });
     },
     async () => {
-      setStatus('Coffre initialise.');
+      setStatus(t('status.vaultInitialized'));
       rememberVault(getValue('vault'));
       await refreshList();
     }
@@ -356,7 +389,7 @@ document.getElementById('btnImport')?.addEventListener('click', async () => {
   await runAction(
     async () => {
       requireFields(['vault', 'password', 'file']);
-      setStatus('Import en cours...');
+      setStatus(t('status.importInProgress'));
       return call('vault_import', {
         vault: getValue('vault'),
         password: getValue('password'),
@@ -365,7 +398,7 @@ document.getElementById('btnImport')?.addEventListener('click', async () => {
       });
     },
     async (doc: any) => {
-      setStatus(`Document importe: ${doc.name}`);
+      setStatus(t('status.documentImported', { name: doc.name }));
       await refreshList();
     }
   );
@@ -374,7 +407,7 @@ document.getElementById('btnImport')?.addEventListener('click', async () => {
 document.getElementById('btnList')?.addEventListener('click', async () => {
   await runAction(async () => {
     requireFields(['vault', 'password']);
-    setStatus('Chargement des documents...');
+    setStatus(t('status.loadingDocuments'));
     await refreshList();
   });
 });
@@ -382,7 +415,7 @@ document.getElementById('btnList')?.addEventListener('click', async () => {
 document.getElementById('btnHealthCheck')?.addEventListener('click', async () => {
   await runAction(async () => {
     requireFields(['vault', 'password']);
-    setStatus('Analyse du coffre...');
+    setStatus(t('status.healthCheckInProgress'));
     const report = await call<{ blobFiles: number; trackedVersions: number; orphanBlobs: string[] }>(
       'vault_check',
       {
@@ -391,11 +424,11 @@ document.getElementById('btnHealthCheck')?.addEventListener('click', async () =>
       }
     );
     const orphan = report.orphanBlobs.length;
-    healthSummary.textContent = `Blobs: ${report.blobFiles}, versions suivies: ${report.trackedVersions}, orphelins: ${orphan}`;
+    healthSummary.textContent = t('diagnostic.summary', { blobs: report.blobFiles, versions: report.trackedVersions, orphans: orphan });
     if (orphan > 0) {
-      setStatus(`Diagnostic terminé: ${orphan} blob(s) orphelin(s) détecté(s).`, true);
+      setStatus(t('status.healthOrphans', { count: orphan }), true);
     } else {
-      setStatus('Diagnostic terminé: coffre cohérent.');
+      setStatus(t('status.healthOk'));
     }
   });
 });
@@ -407,17 +440,17 @@ document.getElementById('btnBackup')?.addEventListener('click', async () => {
       defaultPath: 'arcive-backup.zip'
     });
     if (!outPath) {
-      setStatus('Sauvegarde annulée par l’utilisateur.');
+      setStatus(t('status.backupCancelled'));
       return;
     }
-    setStatus('Création de la sauvegarde...');
+    setStatus(t('status.backupInProgress'));
     const result = await call<{ outPath: string; documents: number; versions: number }>('vault_backup', {
       vault: getValue('vault'),
       password: getValue('password'),
       out: outPath
     });
     setStatus(
-      `Sauvegarde créée (${result.documents} docs, ${result.versions} versions) vers ${result.outPath}`
+      t('status.backupCreated', { docs: result.documents, versions: result.versions, path: result.outPath })
     );
   });
 });
@@ -427,18 +460,18 @@ document.getElementById('btnRestoreBackup')?.addEventListener('click', async () 
     requireFields(['password']);
     const backupPath = await open({
       multiple: false,
-      filters: [{ name: 'Arcive backup', extensions: ['zip'] }]
+      filters: [{ name: t('dialog.backupFilter'), extensions: ['zip'] }]
     });
     if (typeof backupPath !== 'string') {
-      setStatus('Restauration annulée (aucun fichier sélectionné).');
+      setStatus(t('status.restoreCancelledNoFile'));
       return;
     }
     const vaultDir = await open({ directory: true, multiple: false });
     if (typeof vaultDir !== 'string') {
-      setStatus('Restauration annulée (aucun dossier cible sélectionné).');
+      setStatus(t('status.restoreCancelledNoVault'));
       return;
     }
-    setStatus('Restauration en cours...');
+    setStatus(t('status.restoreInProgress'));
     const restored = await call<{ vaultPath: string; documents: number }>('vault_restore_backup', {
       from: backupPath,
       vault: vaultDir,
@@ -446,7 +479,7 @@ document.getElementById('btnRestoreBackup')?.addEventListener('click', async () 
     });
     getInput('vault').value = restored.vaultPath;
     rememberVault(restored.vaultPath);
-    setStatus(`Coffre restauré (${restored.documents} documents) dans ${restored.vaultPath}`);
+    setStatus(t('status.vaultRestored', { count: restored.documents, path: restored.vaultPath }));
     await refreshList();
   });
 });
@@ -454,14 +487,14 @@ document.getElementById('btnRestoreBackup')?.addEventListener('click', async () 
 document.getElementById('btnSearch')?.addEventListener('click', async () => {
   await runAction(async () => {
     requireFields(['vault', 'password', 'query']);
-    setStatus('Recherche...');
+    setStatus(t('status.searchInProgress'));
     const docs = await call<any[]>('vault_search', {
       vault: getValue('vault'),
       password: getValue('password'),
       query: getValue('query')
     });
     render(docs);
-    setStatus(`${docs.length} resultat(s).`);
+    setStatus(t('status.searchResults', { count: docs.length }));
   });
 });
 
@@ -469,7 +502,7 @@ document.getElementById('btnVersion')?.addEventListener('click', async () => {
   await runAction(
     async () => {
       requireFields(['vault', 'password', 'docId', 'versionFile']);
-      setStatus('Ajout de version...');
+      setStatus(t('status.versionAdding'));
       return call('vault_add_version', {
         vault: getValue('vault'),
         password: getValue('password'),
@@ -479,7 +512,7 @@ document.getElementById('btnVersion')?.addEventListener('click', async () => {
       });
     },
     async () => {
-      setStatus('Version ajoutée.');
+      setStatus(t('status.versionAdded'));
       await refreshList();
     }
   );
@@ -489,7 +522,7 @@ document.getElementById('btnDelete')?.addEventListener('click', async () => {
   await runAction(
     async () => {
       requireFields(['vault', 'password', 'docId']);
-      setStatus('Suppression logique...');
+      setStatus(t('status.deleteInProgress'));
       return call('vault_delete', {
         vault: getValue('vault'),
         password: getValue('password'),
@@ -497,7 +530,7 @@ document.getElementById('btnDelete')?.addEventListener('click', async () => {
       });
     },
     async () => {
-      setStatus('Document envoyé en corbeille.');
+      setStatus(t('status.documentTrashed'));
       await refreshList();
     }
   );
@@ -507,7 +540,7 @@ document.getElementById('btnRestore')?.addEventListener('click', async () => {
   await runAction(
     async () => {
       requireFields(['vault', 'password', 'docId']);
-      setStatus('Restauration...');
+      setStatus(t('status.documentRestoring'));
       return call('vault_restore', {
         vault: getValue('vault'),
         password: getValue('password'),
@@ -515,7 +548,7 @@ document.getElementById('btnRestore')?.addEventListener('click', async () => {
       });
     },
     async () => {
-      setStatus('Document restauré.');
+      setStatus(t('status.documentRestored'));
       await refreshList();
     }
   );
@@ -524,7 +557,7 @@ document.getElementById('btnRestore')?.addEventListener('click', async () => {
 document.getElementById('btnExport')?.addEventListener('click', async () => {
   await runAction(async () => {
     requireFields(['vault', 'password', 'docId', 'exportOut']);
-    setStatus('Export...');
+    setStatus(t('status.exportInProgress'));
     const out = getValue('exportOut');
     await call('vault_export', {
       vault: getValue('vault'),
@@ -532,7 +565,7 @@ document.getElementById('btnExport')?.addEventListener('click', async () => {
       id: getValue('docId'),
       out
     });
-    setStatus(`Export terminé: ${out}`);
+    setStatus(t('status.exportDone', { path: out }));
   });
 });
 
@@ -540,14 +573,14 @@ document.getElementById('btnPurge')?.addEventListener('click', async () => {
   await runAction(
     async () => {
       requireFields(['vault', 'password']);
-      setStatus('Purge de la corbeille...');
+      setStatus(t('status.purgeInProgress'));
       return call<{ purged: number }>('vault_purge', {
         vault: getValue('vault'),
         password: getValue('password')
       });
     },
     async (response) => {
-      setStatus(`Purge terminée (${response.purged} document(s)).`);
+      setStatus(t('status.purgeDone', { count: response.purged }));
       await refreshList();
     }
   );
@@ -558,7 +591,7 @@ document
   ?.addEventListener('click', async () => {
     await runAction(async () => {
       requireFields(['vault', 'password', 'newPassword']);
-      setStatus('Rotation du mot de passe...');
+      setStatus(t('status.passwordRotating'));
       await call('vault_rotate_password', {
         vault: getValue('vault'),
         password: getValue('password'),
@@ -566,7 +599,7 @@ document
       });
       getInput('password').value = getValue('newPassword');
       getInput('newPassword').value = '';
-      setStatus('Mot de passe mis à jour.');
+      setStatus(t('status.passwordUpdated'));
     });
   });
 
@@ -581,9 +614,9 @@ document
       if (typeof selected === 'string') {
         getInput('vault').value = selected;
         rememberVault(selected);
-        setStatus(`Coffre sélectionné: ${selected}`);
+        setStatus(t('status.vaultSelected', { path: selected }));
       } else {
-        setStatus('Sélection de coffre annulée.');
+        setStatus(t('status.vaultPickCancelled'));
       }
     });
   });
@@ -596,16 +629,16 @@ document
         multiple: false,
         filters: [
           {
-            name: 'Documents',
+            name: t('dialog.documentsFilter'),
             extensions: ['pdf', 'txt', 'md', 'docx', 'odt']
           }
         ]
       });
       if (typeof selected === 'string') {
         getInput('file').value = selected;
-        setStatus(`Fichier sélectionné: ${selected}`);
+        setStatus(t('status.fileSelected', { path: selected }));
       } else {
-        setStatus('Sélection de fichier annulée.');
+        setStatus(t('status.filePickCancelled'));
       }
     });
   });
@@ -622,9 +655,9 @@ document
       });
       if (selected) {
         getInput('exportOut').value = selected;
-        setStatus(`Fichier d'export choisi: ${selected}`);
+        setStatus(t('status.exportPathSelected', { path: selected }));
       } else {
-        setStatus('Sélection du chemin d’export annulée.');
+        setStatus(t('status.exportPathCancelled'));
       }
     });
   });
@@ -634,4 +667,32 @@ document
 });
 restartLockTimer();
 loadRecentVaults();
+const mainUi = getElement<HTMLDivElement>('main-ui');
+const helpPanel = getElement<HTMLElement>('help-panel');
 
+function showHelp(): void {
+  mainUi.style.display = 'none';
+  helpPanel.classList.remove('hidden');
+  helpPanel.style.display = 'block';
+  applyI18n(helpPanel);
+}
+
+function hideHelp(): void {
+  helpPanel.classList.add('hidden');
+  helpPanel.style.display = 'none';
+  mainUi.style.display = 'block';
+  applyI18n(mainUi);
+}
+
+document.getElementById('btnHelp')?.addEventListener('click', showHelp);
+document.getElementById('btnBackFromHelp')?.addEventListener('click', hideHelp);
+
+initI18n(() => {
+  applyI18n();
+  loadRecentVaults();
+  if (!healthSummary.hasAttribute('data-health')) {
+    healthSummary.textContent = t('diagnostic.none');
+  }
+});
+applyI18n();
+setStatus(t('status.ready'));

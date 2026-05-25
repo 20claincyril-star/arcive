@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "Arcive",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "identifier": "com.arcive.desktop",
   "build": {
     "frontendDist": "../dist-frontend",

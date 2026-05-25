@@ -1,0 +1,153 @@
+{
+  "app": {
+    "title": "Arcive Desktop",
+    "subtitle": "Local encrypted vault, enriched search and diagnostics."
+  },
+  "header": {
+    "langLabel": "Language",
+    "helpBtn": "Help"
+  },
+  "status": {
+    "ready": "Ready.",
+    "sessionLocked": "Session locked (inactivity). Enter your password again.",
+    "sessionPolicyApplied": "Session policy applied ({minutes} min).",
+    "vaultInitInProgress": "Initializing vault...",
+    "vaultInitialized": "Vault initialized.",
+    "importInProgress": "Import in progress...",
+    "documentImported": "Document imported: {name}",
+    "loadingDocuments": "Loading documents...",
+    "documentsCount": "{count} document(s).",
+    "searchInProgress": "Searching...",
+    "searchResults": "{count} result(s).",
+    "healthCheckInProgress": "Analyzing vault...",
+    "healthOrphans": "Diagnostics complete: {count} orphan blob(s) detected.",
+    "healthOk": "Diagnostics complete: vault is consistent.",
+    "backupCancelled": "Backup cancelled by user.",
+    "backupInProgress": "Creating backup...",
+    "backupCreated": "Backup created ({docs} docs, {versions} versions) at {path}",
+    "restoreCancelledNoFile": "Restore cancelled (no file selected).",
+    "restoreCancelledNoVault": "Restore cancelled (no target folder selected).",
+    "restoreInProgress": "Restore in progress...",
+    "vaultRestored": "Vault restored ({count} documents) at {path}",
+    "versionAdding": "Adding version...",
+    "versionAdded": "Version added.",
+    "deleteInProgress": "Soft delete in progress...",
+    "documentTrashed": "Document moved to trash.",
+    "documentRestoring": "Restoring...",
+    "documentRestored": "Document restored.",
+    "exportInProgress": "Exporting...",
+    "exportDone": "Export complete: {path}",
+    "purgeInProgress": "Purging trash...",
+    "purgeDone": "Purge complete ({count} document(s)).",
+    "passwordRotating": "Rotating password...",
+    "passwordUpdated": "Password updated.",
+    "vaultSelected": "Vault selected: {path}",
+    "vaultPickCancelled": "Vault selection cancelled.",
+    "fileSelected": "File selected: {path}",
+    "filePickCancelled": "File selection cancelled.",
+    "exportPathSelected": "Export path chosen: {path}",
+    "exportPathCancelled": "Export path selection cancelled.",
+    "documentSelected": "Document selected: {name}"
+  },
+  "session": {
+    "title": "Session",
+    "lockMinutes": "Auto-lock (minutes)",
+    "applyBtn": "Apply session policy"
+  },
+  "vault": {
+    "title": "Vault",
+    "pathLabel": "Vault path",
+    "pathPlaceholder": "Choose a vault folder",
+    "browseBtn": "Browse...",
+    "passwordLabel": "Password",
+    "initBtn": "Initialize vault"
+  },
+  "import": {
+    "title": "Import",
+    "fileLabel": "File",
+    "filePlaceholder": "Choose a file",
+    "browseBtn": "Browse...",
+    "tagsLabel": "Tags (csv)",
+    "tagsPlaceholder": "taxes,2026",
+    "importBtn": "Import document"
+  },
+  "search": {
+    "title": "Search",
+    "queryLabel": "Search text",
+    "queryPlaceholder": "invoice",
+    "listBtn": "List documents",
+    "searchBtn": "Search",
+    "noResults": "No results."
+  },
+  "recent": {
+    "title": "Recent vaults",
+    "none": "No recent vault."
+  },
+  "diagnostic": {
+    "title": "Vault diagnostics",
+    "analyzeBtn": "Analyze vault health",
+    "none": "No diagnostics run yet.",
+    "summary": "Blobs: {blobs}, tracked versions: {versions}, orphans: {orphans}"
+  },
+  "backup": {
+    "title": "Backup / transfer",
+    "createBtn": "Create ZIP backup",
+    "restoreBtn": "Restore from ZIP"
+  },
+  "doc": {
+    "title": "Document actions",
+    "idLabel": "Document ID",
+    "idPlaceholder": "Document UUID",
+    "versionFileLabel": "New version file",
+    "versionFilePlaceholder": "Version file path",
+    "versionNoteLabel": "Version note",
+    "versionNotePlaceholder": "correction",
+    "addVersionBtn": "Add version",
+    "exportPathLabel": "Export path",
+    "exportPathPlaceholder": "Choose an export path",
+    "browseExportBtn": "Browse...",
+    "deleteBtn": "Delete (trash)",
+    "restoreBtn": "Restore",
+    "exportBtn": "Export",
+    "purgeBtn": "Purge trash"
+  },
+  "security": {
+    "title": "Vault security",
+    "newPasswordLabel": "New password",
+    "newPasswordPlaceholder": "new password",
+    "rotateBtn": "Rotate password"
+  },
+  "error": {
+    "requiredField": "Required field missing: {field}",
+    "elementNotFound": "Element not found: {id}",
+    "invalidPassword": "Invalid password.",
+    "documentNotFound": "Document not found.",
+    "versionNotFound": "Version not found.",
+    "tauriUnavailable": "Tauri interface unavailable.",
+    "pathNotFound": "File or folder not found. Check the selected path.",
+    "accessDenied": "Access denied. Check your permissions on the file or folder.",
+    "generic": "Error: {message}",
+    "lockMinutesRange": "Auto-lock must be between 1 and 180 minutes."
+  },
+  "dialog": {
+    "backupFilter": "Arcive backup",
+    "documentsFilter": "Documents"
+  },
+  "help": {
+    "title": "Arcive help",
+    "intro": "Arcive is a local encrypted document vault. This help summarizes the main UI actions.",
+    "vaultTitle": "Vault",
+    "vaultBody": "Choose a folder, enter the password and initialize the vault. Recent vaults appear below.",
+    "importTitle": "Import",
+    "importBody": "Select a file, add optional CSV tags, then import into the open vault.",
+    "searchTitle": "Search",
+    "searchBody": "List all documents or search by text in names, tags and indexed content.",
+    "docTitle": "Documents",
+    "docBody": "Click a result to fill the ID. Export, add a version, trash or restore.",
+    "backupTitle": "Backup",
+    "backupBody": "Create an encrypted ZIP of the vault or restore from backup to a new folder.",
+    "securityTitle": "Security",
+    "securityBody": "The session locks after inactivity. You can rotate the vault password.",
+    "backBtn": "Back to application"
+  }
+}
